@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Generate API</title>
+  <style>
+    body {
+      font-family: "Poppins", sans-serif;
+      background: linear-gradient(135deg, #F5EFE6, #E8DFCA, #CBDCEB, #6D94C5);
+      background-size: 300% 300%;
+      animation: gradientMove 8s ease infinite;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    @keyframes gradientMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .form-container {
+      background-color: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+      padding: 40px 30px;
+      width: 100%;
+      max-width: 400px;
+      transition: transform 0.3s ease;
+    }
+
+    .form-container:hover {
+      transform: translateY(-5px);
+    }
+
+    .form-title {
+      text-align: center;
+      font-size: 1.8em;
+      font-weight: 600;
+      color: #6D94C5;
+      margin-bottom: 25px;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    label {
+      display: block;
+      font-weight: 500;
+      color: #333;
+      margin-bottom: 6px;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #CBDCEB;
+      border-radius: 10px;
+      outline: none;
+      font-size: 1em;
+      background-color: #F5EFE6;
+      transition: all 0.3s ease;
+    }
+
+    input:focus {
+      border-color: #6D94C5;
+      box-shadow: 0 0 5px rgba(109, 148, 197, 0.5);
+      background-color: #fff;
+    }
+
+    .btn-submit {
+      background-color: #6D94C5;
+      color: white;
+      border: none;
+      padding: 12px 0;
+      border-radius: 10px;
+      width: 100%;
+      font-size: 1.05em;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn-submit:hover {
+      background-color: #547CA6;
+      box-shadow: 0 4px 12px rgba(109, 148, 197, 0.4);
+    }
+
+    .result {
+      margin-top: 25px;
+      padding: 15px;
+      background-color: #E8DFCA;
+      border-radius: 10px;
+      text-align: center;
+      font-weight: 500;
+      color: #333;
+      word-break: break-all;
+      display: none;
+    }
+
+    @media (max-width: 480px) {
+      .form-container {
+        padding: 30px 20px;
+      }
+      .form-title {
+        font-size: 1.5em;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="form-container">
+    <h2 class="form-title">Generate API Key</h2>
+    <form id="apiForm">
+      <div class="form-group">
+        <label for="apiName">Nama API</label>
+        <input type="text" id="apiName" name="apiName" placeholder="Masukkan nama API..." required>
+      </div>
+
+      <button type="submit" class="btn-submit">Generate API</button>
+    </form>
+
+    <div class="result" id="resultBox">
+      <p><strong>API Name:</strong> <span id="showApiName"></span></p>
+      <p><strong>Generated Key:</strong></p>
+      <p id="apiKey" style="color:#6D94C5; font-weight:600;"></p>
+    </div>
+  </div>
+
+  <script>
+  const form = document.getElementById('apiForm');
+  const resultBox = document.getElementById('resultBox');
+  const showApiName = document.getElementById('showApiName');
+  const apiKey = document.getElementById('apiKey');
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const name = document.getElementById('apiName').value.trim();
+
+    if (name === "") {
+      alert("Nama API tidak boleh kosong!");
+      return;
+    }
+
+    try {
+      const response = await fetch('/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ apiName: name })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        showApiName.textContent = data.apiName;
+        apiKey.textContent = data.api;
+        resultBox.style.display = "block";
+        form.reset();
+      } else {
+        alert(data.error || "Gagal membuat API key.");
+      }
+    } catch (error) {
+      console.error("❌ Error:", error);
+      alert("Terjadi kesalahan koneksi ke server.");
+    }
+  });
+</script>
+</body>
+</html>
