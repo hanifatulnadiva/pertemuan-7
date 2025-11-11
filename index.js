@@ -53,6 +53,22 @@ app.post('/create', (req, res) => {
   });
 });
 
+// Validasi API Key via Postman
+app.post('/api/validate', (req, res) => {
+  const { api } = req.body;
+  if (!api) return res.status(400).json({ message: 'API key wajib diisi!' });
+
+  db.query('SELECT * FROM tugas_api WHERE api = ?', [api], (err, rows) => {
+    if (err) return res.status(500).json({ message: 'Gagal cek ke database' });
+    if (rows.length > 0) {
+      res.json({ valid: true, keyword: rows[0].keyword });
+    } else {
+      res.json({ valid: false });
+    }
+  });
+});
+
+
 app.listen(port, () => {
   console.log(`🚀 Server berjalan di http://localhost:${port}`);
 });
